@@ -23,17 +23,33 @@ app.post('/api/simulate', async (req, res) => {
       return res.status(400).json({ error: 'Le paramètre "topic" est requis.' });
     }
     try {
-      const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'user',
-            content: `Analyse l'opinion publique sur le sujet suivant : ${topic}`,
-          },
-        ],
-        max_tokens: 150,
-        temperature: 0.7,
-      });
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              {
+                role: 'system',
+                content: 'Vous êtes un simulateur de réponses pour trois personas différents.',
+              },
+              {
+                role: 'user',
+                content: `
+                  Persona 1 : 
+                  - Âge : 35 ans, Femme, Californie, Master en éducation, Mariée, Enseignante, Revenu niveau 6.
+                  - Question : Analysez l'opinion publique sur [SUJET].
+          
+                  Persona 2 :
+                  - Âge : 45 ans, Homme, Texas, Licence, Célibataire, Ingénieur logiciel, Revenu niveau 8.
+                  - Question : Analysez l'opinion publique sur [SUJET].
+          
+                  Persona 3 :
+                  - Âge : 28 ans, Non-binaire, New York, Doctorat en sociologie, Vivant en couple, Chercheur, Revenu niveau 7.
+                  - Question : Analysez l'opinion publique sur [SUJET].
+                `,
+              },
+            ],
+            max_tokens: 450, // Augmentez le nombre de tokens pour gérer plusieurs réponses
+            temperature: 0.7,
+          });
   
       // Extraction correcte du contenu
       const result = response.choices[0]?.message?.content?.trim();

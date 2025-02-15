@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Brain,
   BarChart3,
@@ -11,17 +11,12 @@ import {
   Moon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// 1. On importe Link depuis react-router-dom
-import { Link } from 'react-router-dom';
-
-// 2. On crée un composant MotionLink
-const MotionLink = motion(Link);
+import './App.css'; // Assurez-vous d'avoir un fichier CSS pour le style
 
 function App() {
   const [topic, setTopic] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
-  const [simulationResult, setSimulationResult] = useState<{ result?: string; error?: string } | null>(null);
+  const [simulationResults, setSimulationResults] = useState([]);
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -36,7 +31,7 @@ function App() {
   const handleSimulation = async () => {
     if (!topic) return;
     setIsSimulating(true);
-    setSimulationResult(null);
+    setSimulationResults([]);
     try {
       const response = await fetch('http://localhost:5000/api/simulate', {
         method: 'POST',
@@ -47,17 +42,14 @@ function App() {
         throw new Error('Erreur lors de la simulation');
       }
       const data = await response.json();
-    console.log(data);
-      setSimulationResult(data);
+      setSimulationResults(data.results);
     } catch (error) {
       console.error(error);
-      setSimulationResult({ error: "Une erreur s'est produite. Veuillez réessayer." });
+      alert("Une erreur s'est produite. Veuillez réessayer.");
     } finally {
       setIsSimulating(false);
     }
   };
-  
-
 
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
@@ -67,7 +59,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
         {/* Hero Section */}
@@ -87,15 +78,15 @@ function App() {
         </motion.div>
 
         {/* Simulation Input */}
-        <motion.div 
+        <motion.div
           className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-16 transition-colors"
           initial="initial"
           animate="animate"
           variants={fadeIn}
         >
           <div className="space-y-4">
-            <label 
-              htmlFor="topic" 
+            <label
+              htmlFor="topic"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               Sujet à analyser
@@ -118,7 +109,7 @@ function App() {
               whileTap={{ scale: 0.98 }}
             >
               {isSimulating ? (
-                <motion.div 
+                <motion.div
                   className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -134,27 +125,52 @@ function App() {
         </motion.div>
 
         {/* Résultat de la simulation */}
-        {simulationResult && (
-          <motion.div 
-            className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mb-16 transition-colors"
+        {simulationResults.length > 0 && (
+          <motion.div
+            className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mb-16 transition-colors"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
           >
-            {simulationResult.error ? (
-              <p className="text-red-600 dark:text-red-400 text-center font-semibold">
-                {simulationResult.error}
-              </p>
-            ) : (
-              <>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-4">
-                  Résultat de la simulation
-                </h2>
-                <p className="text-gray-700 dark:text-gray-300 text-center">
-                  {simulationResult.result}
-                </p>
-              </>
-            )}
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-4">
+              Résultat de la simulation
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              {simulationResults.map((result, index) => (
+                <div
+                  key={index}
+                  className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg transition-colors"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Persona {index + 1}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2">
+                    <strong>Âge :</strong> {result.persona.age}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2">
+                    <strong>Genre :</strong> {result.persona.gender}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2">
+                    <strong>Localisation :</strong> {result.persona.location}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2">
+                    <strong>Éducation :</strong> {result.persona.education}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2">
+                    <strong>Statut Marital :</strong> {result.persona.maritalStatus}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2">
+                    <strong>Profession :</strong> {result.persona.occupation}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-2">
+                    <strong>Revenu :</strong> Niveau {result.persona.incomeLevel}
+                  </p>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    <strong>Réponse :</strong> {result.response}
+                  </p>
+                </div>
+              ))}
+            </div>
           </motion.div>
         )}
 
@@ -232,7 +248,7 @@ function App() {
             />
           </motion.div>
         </motion.div>
-      </main> 
+      </main>
     </div>
   );
 }

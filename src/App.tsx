@@ -21,8 +21,8 @@ const MotionLink = motion(Link);
 function App() {
   const [topic, setTopic] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
+  const [simulationResult, setSimulationResult] = useState<{ result?: string; error?: string } | null>(null);
   const [isDark, setIsDark] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     if (isDark) {
@@ -32,11 +32,32 @@ function App() {
     }
   }, [isDark]);
 
-  const handleSimulation = () => {
+  // Fonction de simulation : appel à l'API OpenAI via votre endpoint backend
+  const handleSimulation = async () => {
     if (!topic) return;
     setIsSimulating(true);
-    setTimeout(() => setIsSimulating(false), 2000);
+    setSimulationResult(null);
+    try {
+      const response = await fetch('http://localhost:5000/api/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic }),
+      });
+      if (!response.ok) {
+        throw new Error('Erreur lors de la simulation');
+      }
+      const data = await response.json();
+    console.log(data);
+      setSimulationResult(data);
+    } catch (error) {
+      console.error(error);
+      setSimulationResult({ error: "Une erreur s'est produite. Veuillez réessayer." });
+    } finally {
+      setIsSimulating(false);
+    }
   };
+  
+
 
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
@@ -66,15 +87,15 @@ function App() {
         </motion.div>
 
         {/* Simulation Input */}
-        <motion.div
+        <motion.div 
           className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-16 transition-colors"
           initial="initial"
           animate="animate"
           variants={fadeIn}
         >
           <div className="space-y-4">
-            <label
-              htmlFor="topic"
+            <label 
+              htmlFor="topic" 
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               Sujet à analyser
@@ -97,7 +118,7 @@ function App() {
               whileTap={{ scale: 0.98 }}
             >
               {isSimulating ? (
-                <motion.div
+                <motion.div 
                   className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -111,6 +132,31 @@ function App() {
             </motion.button>
           </div>
         </motion.div>
+
+        {/* Résultat de la simulation */}
+        {simulationResult && (
+          <motion.div 
+            className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mb-16 transition-colors"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+          >
+            {simulationResult.error ? (
+              <p className="text-red-600 dark:text-red-400 text-center font-semibold">
+                {simulationResult.error}
+              </p>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-4">
+                  Résultat de la simulation
+                </h2>
+                <p className="text-gray-700 dark:text-gray-300 text-center">
+                  {simulationResult.result}
+                </p>
+              </>
+            )}
+          </motion.div>
+        )}
 
         {/* Features */}
         <div id="features" className="grid md:grid-cols-3 gap-8 mb-16">

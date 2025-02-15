@@ -1,6 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Brain, BarChart3, Users, MessageSquare, ArrowRight, Menu, X, Sun, Moon } from 'lucide-react';
+import {
+  Brain,
+  BarChart3,
+  Users,
+  MessageSquare,
+  ArrowRight,
+  Menu,
+  X,
+  Sun,
+  Moon
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// 1. On importe Link depuis react-router-dom
+import { Link } from 'react-router-dom';
+
+// 2. On crée un composant MotionLink
+const MotionLink = motion(Link);
 
 function App() {
   const [topic, setTopic] = useState('');
@@ -30,101 +46,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
-      {/* Header */}
-      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm fixed w-full z-50 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <motion.div 
-              className="flex items-center space-x-2"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <Brain className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">OpinionSim AI</span>
-            </motion.div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <motion.a 
-                href="#features" 
-                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Fonctionnalités
-              </motion.a>
-              <motion.a 
-                href="#about" 
-                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                À propos
-              </motion.a>
-              <motion.button
-                onClick={() => setIsDark(!isDark)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-gray-600" />}
-              </motion.button>
-            </nav>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center space-x-4">
-              <motion.button
-                onClick={() => setIsDark(!isDark)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-gray-600" />}
-              </motion.button>
-              <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-600 dark:text-gray-300"
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-white dark:bg-gray-900 transition-colors"
-            >
-              <div className="px-4 py-4 space-y-4">
-                <a 
-                  href="#features" 
-                  className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Fonctionnalités
-                </a>
-                <a 
-                  href="#about" 
-                  className="block text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  À propos
-                </a>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
         {/* Hero Section */}
-        <motion.div 
+        <motion.div
           className="text-center mb-16"
           initial="initial"
           animate="animate"
@@ -134,19 +60,23 @@ function App() {
             Simulez l'Opinion Publique avec l'IA
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Découvrez ce que pense vraiment le public sur n'importe quel sujet grâce à notre simulation alimentée par l'intelligence artificielle.
+            Découvrez ce que pense vraiment le public sur n'importe quel sujet grâce à notre
+            simulation alimentée par l'intelligence artificielle.
           </p>
         </motion.div>
 
         {/* Simulation Input */}
-        <motion.div 
+        <motion.div
           className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-16 transition-colors"
           initial="initial"
           animate="animate"
           variants={fadeIn}
         >
           <div className="space-y-4">
-            <label htmlFor="topic" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="topic"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Sujet à analyser
             </label>
             <input
@@ -167,10 +97,10 @@ function App() {
               whileTap={{ scale: 0.98 }}
             >
               {isSimulating ? (
-                <motion.div 
+                <motion.div
                   className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                 />
               ) : (
                 <>
@@ -186,19 +116,26 @@ function App() {
         <div id="features" className="grid md:grid-cols-3 gap-8 mb-16">
           {[
             {
-              icon: <BarChart3 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />,
-              title: "Analyse Détaillée",
-              description: "Obtenez des analyses approfondies basées sur des millions de points de données."
+              icon: (
+                <BarChart3 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+              ),
+              title: 'Analyse Détaillée',
+              description:
+                'Obtenez des analyses approfondies basées sur des millions de points de données.'
             },
             {
               icon: <Users className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />,
-              title: "Segments Démographiques",
-              description: "Comprenez les opinions par groupe d'âge, région et catégorie socio-professionnelle."
+              title: 'Segments Démographiques',
+              description:
+                "Comprenez les opinions par groupe d'âge, région et catégorie socio-professionnelle."
             },
             {
-              icon: <MessageSquare className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />,
-              title: "Tendances en Temps Réel",
-              description: "Suivez l'évolution des opinions et identifiez les tendances émergentes."
+              icon: (
+                <MessageSquare className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+              ),
+              title: 'Tendances en Temps Réel',
+              description:
+                "Suivez l'évolution des opinions et identifiez les tendances émergentes."
             }
           ].map((feature, index) => (
             <motion.div
@@ -211,7 +148,9 @@ function App() {
             >
               <div className="flex items-center space-x-2 mb-4">
                 {feature.icon}
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{feature.title}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {feature.title}
+                </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
             </motion.div>
@@ -219,16 +158,21 @@ function App() {
         </div>
 
         {/* About Section */}
-        <motion.div 
-          id="about" 
+        <motion.div
+          id="about"
           className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transition-colors"
           initial="initial"
           animate="animate"
           variants={fadeIn}
         >
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">À propos d'OpinionSim AI</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            À propos d'OpinionSim AI
+          </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Notre plateforme utilise des algorithmes d'intelligence artificielle de pointe pour simuler et analyser l'opinion publique sur divers sujets. En combinant l'apprentissage automatique avec des données démographiques détaillées, nous fournissons des insights précis et pertinents.
+            Notre plateforme utilise des algorithmes d'intelligence artificielle de pointe pour
+            simuler et analyser l'opinion publique sur divers sujets. En combinant l'apprentissage
+            automatique avec des données démographiques détaillées, nous fournissons des insights
+            précis et pertinents.
           </p>
           <motion.div
             className="rounded-xl overflow-hidden"
@@ -242,20 +186,7 @@ function App() {
             />
           </motion.div>
         </motion.div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white dark:bg-gray-900 mt-16 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <Brain className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-gray-900 dark:text-white font-semibold">OpinionSim AI</span>
-            </div>
-            <p className="text-gray-500 dark:text-gray-400">&copy; 2024 OpinionSim AI. Tous droits réservés.</p>
-          </div>
-        </div>
-      </footer>
+      </main> 
     </div>
   );
 }

@@ -23,28 +23,60 @@ app.post('/api/simulate', async (req, res) => {
       return res.status(400).json({ error: 'Le paramètre "topic" est requis.' });
     }
     try {
+        const personas = {
+          persona1: {
+            name: 'Alice',
+            age: 35,
+            gender: 'Femme',
+            location: 'Californie',
+            education: 'Master en éducation',
+            maritalStatus: 'Mariée',
+            occupation: 'Enseignante',
+            incomeLevel: 6,
+          },
+          persona2: {
+            name: 'John',
+            age: 45,
+            gender: 'Homme',
+            location: 'Texas',
+            education: 'Licence',
+            maritalStatus: 'Célibataire',
+            occupation: 'Ingénieur logiciel',
+            incomeLevel: 8,
+          },
+          persona3: {
+            name: 'Alex',
+            age: 28,
+            gender: 'Non-binaire',
+            location: 'New York',
+            education: 'Doctorat en sociologie',
+            maritalStatus: 'Vivant en couple',
+            occupation: 'Chercheur',
+            incomeLevel: 7,
+          }
+        };
+
         const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo',
             messages: [
               {
-                role: 'system',
-                content: 'Vous êtes un simulateur de réponses pour trois personas différents.',
+            role: 'system',
+            content: 'Vous êtes un simulateur de réponses pour trois personas différents.',
               },
               {
-                role: 'user',
-                content: `
-                  Persona 1 : 
-                  - Âge : 35 ans, Femme, Californie, Master en éducation, Mariée, Enseignante, Revenu niveau 6.
-                  - Question : Analysez l'opinion publique sur [SUJET].
-          
-                  Persona 2 :
-                  - Âge : 45 ans, Homme, Texas, Licence, Célibataire, Ingénieur logiciel, Revenu niveau 8.
-                  - Question : Analysez l'opinion publique sur [SUJET].
-          
-                  Persona 3 :
-                  - Âge : 28 ans, Non-binaire, New York, Doctorat en sociologie, Vivant en couple, Chercheur, Revenu niveau 7.
-                  - Question : Analysez l'opinion publique sur [SUJET].
-                `,
+            role: 'user',
+            content: `
+            Ne fournissez aucun autre texte à part la réponse des persona sur le ${topic}. Exemple : Marie Duboit : Son avis...  
+            Voilà les personnages
+              ${personas.persona1.name}: 
+              - Âge : ${personas.persona1.age} ans, ${personas.persona1.gender}, ${personas.persona1.location}, ${personas.persona1.education}, ${personas.persona1.maritalStatus}, ${personas.persona1.occupation}, Revenu niveau ${personas.persona1.incomeLevel}.
+              
+              ${personas.persona2.name}: 
+              - Âge : ${personas.persona2.age} ans, ${personas.persona2.gender}, ${personas.persona2.location}, ${personas.persona2.education}, ${personas.persona2.maritalStatus}, ${personas.persona2.occupation}, Revenu niveau ${personas.persona2.incomeLevel}.
+              
+              ${personas.persona3.name}: 
+              - Âge : ${personas.persona3.age} ans, ${personas.persona3.gender}, ${personas.persona3.location}, ${personas.persona3.education}, ${personas.persona3.maritalStatus}, ${personas.persona3.occupation}, Revenu niveau ${personas.persona3.incomeLevel}.
+            `,
               },
             ],
             max_tokens: 450, // Augmentez le nombre de tokens pour gérer plusieurs réponses

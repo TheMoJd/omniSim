@@ -1,22 +1,63 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Brain,
   BarChart3,
   Users,
   MessageSquare,
   ArrowRight,
-  Menu,
-  X,
-  Sun,
-  Moon
+  User,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import './App.css'; // Assurez-vous d'avoir un fichier CSS pour le style
+
+type Persona = {
+  name: string;
+  age: number;
+  gender: string;
+  location: string;
+  education: string;
+  maritalStatus: string;
+  occupation: string;
+  incomeLevel: number;
+};
+
+const personas: { [key: string]: Persona } = {
+  persona1: {
+    name: 'Alice',
+    age: 35,
+    gender: 'Femme',
+    location: 'Californie',
+    education: 'Master en éducation',
+    maritalStatus: 'Mariée',
+    occupation: 'Enseignante',
+    incomeLevel: 6,
+  },
+  persona2: {
+    name: 'John',
+    age: 45,
+    gender: 'Homme',
+    location: 'Texas',
+    education: 'Licence',
+    maritalStatus: 'Célibataire',
+    occupation: 'Ingénieur logiciel',
+    incomeLevel: 8,
+  },
+  persona3: {
+    name: 'Alex',
+    age: 28,
+    gender: 'Non-binaire',
+    location: 'New York',
+    education: 'Doctorat en sociologie',
+    maritalStatus: 'Vivant en couple',
+    occupation: 'Chercheur',
+    incomeLevel: 7,
+  },
+};
 
 function App() {
   const [topic, setTopic] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
-  const [simulationResults, setSimulationResults] = useState([]);
+  // simulationResults contiendra un tableau de chaînes de caractères correspondant aux résultats
+  const [simulationResults, setSimulationResults] = useState<string[]>([]);
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -27,7 +68,7 @@ function App() {
     }
   }, [isDark]);
 
-  // Fonction de simulation : appel à l'API OpenAI via votre endpoint backend
+  // Appel à votre backend pour lancer la simulation OpenAI
   const handleSimulation = async () => {
     if (!topic) return;
     setIsSimulating(true);
@@ -42,7 +83,12 @@ function App() {
         throw new Error('Erreur lors de la simulation');
       }
       const data = await response.json();
-      setSimulationResults(data.results);
+      // On suppose que data.result est une chaîne avec plusieurs personas séparés par "\n\n"
+      const rawResult = data.result || '';
+      const resultsArray = rawResult.split('\n\n').filter(
+        (line: string) => line.trim() !== ''
+      );
+      setSimulationResults(resultsArray);
     } catch (error) {
       console.error(error);
       alert("Une erreur s'est produite. Veuillez réessayer.");
@@ -72,8 +118,7 @@ function App() {
             Simulez l'Opinion Publique avec l'IA
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Découvrez ce que pense vraiment le public sur n'importe quel sujet grâce à notre
-            simulation alimentée par l'intelligence artificielle.
+            Découvrez ce que pense vraiment le public sur n'importe quel sujet grâce à notre simulation alimentée par l'intelligence artificielle.
           </p>
         </motion.div>
 
@@ -136,45 +181,52 @@ function App() {
               Résultat de la simulation
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
-              {simulationResults.map((result, index) => (
-                <div
-                  key={index}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg transition-colors"
-                >
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Persona {index + 1}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-2">
-                    <strong>Âge :</strong> {result.persona.age}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 mb-2">
-                    <strong>Genre :</strong> {result.persona.gender}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 mb-2">
-                    <strong>Localisation :</strong> {result.persona.location}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 mb-2">
-                    <strong>Éducation :</strong> {result.persona.education}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 mb-2">
-                    <strong>Statut Marital :</strong> {result.persona.maritalStatus}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 mb-2">
-                    <strong>Profession :</strong> {result.persona.occupation}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300 mb-2">
-                    <strong>Revenu :</strong> Niveau {result.persona.incomeLevel}
-                  </p>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    <strong>Réponse :</strong> {result.response}
-                  </p>
-                </div>
-              ))}
+              {Object.keys(personas).map((key, index) => {
+                const persona: Persona = personas[key];
+                return (
+                  <motion.div
+                    key={key}
+                    className="relative bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg transition-colors"
+                    whileHover="hover"
+                    initial="rest"
+                    animate="rest"
+                    variants={{
+                      rest: {},
+                      hover: {}
+                    }}
+                  >
+                    <h3 className="flex justify-center text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      {persona.name}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 whitespace-pre-line">
+                      {simulationResults[index]}
+                    </p>
+                    {/* Overlay des détails, apparaît au survol */}
+                    <motion.div
+                      className="absolute inset-0 bg-black bg-opacity-70 rounded-xl flex flex-col items-center justify-center p-4"
+                      variants={{
+                        rest: { opacity: 0 },
+                        hover: { opacity: 1 }
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <User className="w-6 h-6 text-white mb-2" />
+                      <p className="text-sm text-white">Âge: {persona.age} ans</p>
+                      <p className="text-sm text-white">Genre: {persona.gender}</p>
+                      <p className="text-sm text-white">Localisation: {persona.location}</p>
+                      <p className="text-sm text-white">Formation: {persona.education}</p>
+                      <p className="text-sm text-white">Statut: {persona.maritalStatus}</p>
+                      <p className="text-sm text-white">Profession: {persona.occupation}</p>
+                      <p className="text-sm text-white">Revenu: {persona.incomeLevel}</p>
+                    </motion.div>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}
 
-        {/* Features */}
+        {/* Features Section */}
         <div id="features" className="grid md:grid-cols-3 gap-8 mb-16">
           {[
             {
@@ -231,10 +283,7 @@ function App() {
             À propos d'OpinionSim AI
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Notre plateforme utilise des algorithmes d'intelligence artificielle de pointe pour
-            simuler et analyser l'opinion publique sur divers sujets. En combinant l'apprentissage
-            automatique avec des données démographiques détaillées, nous fournissons des insights
-            précis et pertinents.
+            Notre plateforme utilise des algorithmes d'intelligence artificielle de pointe pour simuler et analyser l'opinion publique sur divers sujets. En combinant l'apprentissage automatique avec des données démographiques détaillées, nous fournissons des insights précis et pertinents.
           </p>
           <motion.div
             className="rounded-xl overflow-hidden"

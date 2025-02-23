@@ -103,13 +103,11 @@ app.post('/api/generate-personas', async (req, res) => {
           `,
         },
       ],
-      max_tokens: 500,
       temperature: 0.7,
     });
 
       // Extraction du contenu brut
     let result = response.choices[0]?.message?.content?.trim() || '';
-    console.log("Réponse brute d'OpenAI :", result);
     const personas = JSON.parse(result);
     console.log(personas);
 
@@ -161,9 +159,8 @@ app.post('/api/confirm-personas', async (req, res) => {
 // Route pour la simulation
 app.post('/api/simulate', async (req, res) => {
   const { topic, personas } = req.body;
-
+  console.log("ON est dans simulate :");
   try {
-
     // Validation et sanitisation
     const validatedData = simulationSchema.parse({ topic });
     const sanitizedTopic = sanitize(validatedData.topic, { allowedTags: [], allowedAttributes: {} });
@@ -178,39 +175,38 @@ app.post('/api/simulate', async (req, res) => {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: 'Vous êtes un simulateur de réponses pour trois personas différents.' },
-        {
-          role: 'user',
-          content: `
-          Ne fournissez aucun autre texte à part la réponse des persona sur le ${validatedData.topic}.   
-          Voilà les personnages
-            ${personas[0].name}: 
-            - Âge : ${personas[0].age} ans, ${personas[0].gender}, ${personas[0].location}, ${personas[0].education}, ${personas[0].maritalStatus}, ${personas[0].occupation}, Revenu niveau ${personas[0].incomeLevel}
-             d'origine ${personas[0].ethnicGroup}, de religion ${personas[0].religion}, et vous pouvez le décrire comme ${personas[0].descriptionOfThePersona}.
-            
-            ${personas[1].name}: 
-            - Âge : ${personas[1].age} ans, ${personas[1].gender}, ${personas[1].location}, ${personas[1].education}, ${personas[1].maritalStatus}, ${personas[1].occupation}, Revenu niveau ${personas[1].incomeLevel}, 
-            d'origine ${personas[1].ethnicGroup}, de religion ${personas[1].religion}, et vous pouvez le décrire comme ${personas[1].descriptionOfThePersona}.
-            
-            ${personas[2].name}: 
-            - Âge : ${personas[2].age} ans, ${personas[2].gender}, ${personas[2].location}, ${personas[2].education}, ${personas[2].maritalStatus}, ${personas[2].occupation}, Revenu niveau ${personas[2].incomeLevel},
-              d'origine ${personas[2].ethnicGroup}, de religion ${personas[2].religion}, et vous pouvez le décrire comme ${personas[2].descriptionOfThePersona}.
-             Format attendu : JSON avec un tableau de 3 objets "Opinion". Voilà Opinion : 
-             export type Opinion {
-                nameOfPersona: string;
-                opinion: string;
-            }
-              `,
-            },
-    ],
-      max_tokens: 450,
+      { role: 'system', content: 'Vous êtes un simulateur de réponses pour trois personas différents.' },
+      {
+        role: 'user',
+        content: `
+        Vous avez 3 personas : 
+        - ${personas[0].name}, ${personas[0].age} ans, ${personas[0].gender}, ${personas[0].location}, ${personas[0].education}, ${personas[0].maritalStatus}, ${personas[0].occupation}, ${personas[0].incomeLevel}, ${personas[0].ethnicGroup}, ${personas[0].religion}, ${personas[0].description}
+        - ${personas[1].name}, ${personas[1].age} ans, ${personas[1].gender}, ${personas[1].location}, ${personas[1].education}, ${personas[1].maritalStatus}, ${personas[1].occupation}, ${personas[1].incomeLevel}, ${personas[1].ethnicGroup}, ${personas[1].religion}, ${personas[1].description}
+        - ${personas[2].name}, ${personas[2].age} ans, ${personas[2].gender}, ${personas[2].location}, ${personas[2].education}, ${personas[2].maritalStatus}, ${personas[2].occupation}, ${personas[2].incomeLevel}, ${personas[2].ethnicGroup}, ${personas[2].religion}, ${personas[2].description}
+        Fournissez l'avis des personas suivantes sur le sujet suivant : "${validatedData.topic}":
+        Réponds uniquement avec un JSON valide, sans texte additionnel.
+        Format de réponse attendu (strict) :
+        J'attends un tableau d' "Opinion". Voilà l'objet Opinion : 
+        export type Opinion = {
+          nameOfPersona: string;
+          opinion: string;
+        };
+        `,
+      },
+      ],
       temperature: 0.7,
     });
+    let result = response.choices[0]?.message?.content?.trim();
 
-    const result = response.choices[0]?.message?.content?.trim();
-    console.log("Réponse brute d'OpenAI :", result);
-    cache.set(sanitizedTopic, { result, prompt: sanitizedTopic });
-    res.json({ result, prompt: sanitizedTopic });
+
+    // Nettoyage pour retirer d'éventuels blocs de code
+    result = result.replace(/```json/gi, '').replace(/```/g, '').trim();
+    console.log(result);
+
+    const parsedOpinions = JSON.parse(result);  
+    cache.set(sanitizedTopic, { parsedOpinions });
+    console.log(parsedOpinions);
+    res.json({ parsedOpinions });
   } catch (error) {
     logger.error('Erreur lors de la simulation:', error);
     res.status(500).json({ error: "Une erreur interne est survenue." });

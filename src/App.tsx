@@ -52,6 +52,7 @@ function App() {
         throw new Error('Erreur lors de la génération des personas');
       }
       const data = await response.json();
+      console.log('Personas générés :', data.personas);
       // data.personas devrait être un tableau de 3 personas
       setPersonas(data.personas);
     } catch (error) {
@@ -98,7 +99,7 @@ function App() {
   // 2.3) SIMULER LES OPINIONS
   // ---------------------------------------------------------------------------
   const handleSimulate = async () => {
-    if (!topic || personas.length === 0) return;
+    if (!topic || !personas) return;
     setIsSimulating(true);
     setOpinions([]);
 
@@ -115,18 +116,8 @@ function App() {
         throw new Error('Erreur lors de la simulation');
       }
       const data = await response.json();
-
-      // Le backend renvoie un champ "result" qui est censé être le JSON final
-      // contenant un tableau de 3 objets { nameOfPersona, opinion }.
-      // On parse le JSON si nécessaire.
-      let opinionsFromServer: Opinion[] = [];
-      try {
-        opinionsFromServer = JSON.parse(data.result);
-      } catch (err) {
-        console.error("Impossible de parser le JSON renvoyé :", err);
-      }
-
-      setOpinions(opinionsFromServer);
+      console.log('Opinions simulées :', data.parsedOpinions);
+      setOpinions(data.parsedOpinions);
     } catch (error) {
       console.error(error);
       alert("Une erreur s'est produite. Veuillez réessayer.");
@@ -134,6 +125,9 @@ function App() {
       setIsSimulating(false);
     }
   };
+  useEffect(() => {
+    console.log("State opinions mis à jour :", opinions);
+  }, [opinions]);
 
   // ---------------------------------------------------------------------------
   // 2.4) RENDU DE LA PAGE
@@ -328,7 +322,7 @@ function App() {
         )}
 
         {/* SECTION: Résultats de la simulation (opinions) */}
-        {opinions.length > 0 && (
+        {Array.isArray(opinions) && opinions.length > 0 && (
           <motion.div
             className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 mb-16 transition-colors"
             initial={{ opacity: 0, scale: 0.95 }}

@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
 import Layout from "./layout";
 import "./index.css";
+import Poll from "./pages/Poll";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/subscription" element={<Subscription />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/poll" element={<Poll />} />
         </Routes>
       </Layout>
     </Router>

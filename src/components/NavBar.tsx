@@ -39,6 +39,17 @@ const NavBar = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Link
+                  to="/poll"
+                  className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                >
+                  Sondage
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
                   to="/dashboard"
                   className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
@@ -68,6 +79,7 @@ const NavBar = () => {
                 </Link>
               </motion.div>
             </motion.div>
+
             <motion.button
               onClick={() => setIsDark(!isDark)}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

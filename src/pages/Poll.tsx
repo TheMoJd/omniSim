@@ -1,72 +1,55 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Users } from 'lucide-react';
-import { Persona } from '../types/Persona';
 
-const API_URL = 'http://localhost:5000/api';
+interface Persona {
+  id: number;
+  name: string;
+  age: string;
+  occupation: string;
+  region: string;
+}
 
 interface VoteResult {
   persona: Persona;
   choice: string;
   confidence: number;
-  justification: string;
 }
 
-function ComparisonSimulation() {
+const personas: Persona[] = [
+  { id: 1, name: "Emma M.", age: "25-34", occupation: "Développeuse", region: "Île-de-France" },
+  { id: 2, name: "Thomas D.", age: "45-54", occupation: "Enseignant", region: "Nouvelle-Aquitaine" },
+  { id: 3, name: "Sophie L.", age: "35-44", occupation: "Commerçante", region: "Auvergne-Rhône-Alpes" },
+  { id: 4, name: "Pierre M.", age: "55-64", occupation: "Médecin", region: "Bretagne" },
+  { id: 5, name: "Julie P.", age: "18-24", occupation: "Étudiante", region: "Occitanie" }
+];
+
+function Poll() {
   const [optionA, setOptionA] = useState('');
   const [optionB, setOptionB] = useState('');
   const [isSimulating, setIsSimulating] = useState(false);
   const [results, setResults] = useState<VoteResult[]>([]);
-  const [personas, setPersonas] = useState<Persona[]>([]);
-	const [topic, setTopic] = useState<string>('');
-	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
 
-	const simulateVotes = async () => {
-		setIsSimulating(true);
-		setResults([]);
-		try {
-		const response = await fetch('http://localhost:5000/api/simulate-votes', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ optionA, optionB }),
-		});
-		if (!response.ok) throw new Error('Erreur lors de la simulation');
-		const data = await response.json();
-		setResults(data.results);
-		} catch (err) {
-		console.error(err);
-		} finally {
-		setIsSimulating(false);
-		}
-	};
-
-	const handleGeneratePersonas = useCallback(async () => {
-			if (!topic) return;
-			setTopic("Vous devez effectuer un choix entre " + optionA + " et " + optionB);
-			setIsLoading(true);
-			setError(null);
-			setPersonas([]);
-			setOptionA('');
-			setOptionB('');
-			setResults([]);
-			try {
-				const response = await fetch(`${API_URL}/generate-personas`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ topic }),
-				});
-				if (!response.ok) throw new Error('Erreur lors de la génération des personas');
-				const data = await response.json();
-				setPersonas(data.personas);
-			} catch (err) {
-				setError('Impossible de générer les personas.');
-				console.error(err);
-			} finally {
-				setIsLoading(false);
-			}
-		}, [topic]);
+  const simulateVotes = () => {
+    if (!optionA || !optionB) return;
+    
+    setIsSimulating(true);
+    
+    setTimeout(() => {
+      const simulatedResults = personas.map(persona => {
+        const random = Math.random();
+        return {
+          persona,
+          choice: random > 0.5 ? optionA : optionB,
+          confidence: Math.round(Math.random() * 40 + 60)
+        };
+      });
+      
+      setResults(simulatedResults);
+      setIsSimulating(false);
+    }, 2000);
+  };
 
   const getAggregatedData = () => {
     const counts = {
@@ -93,6 +76,8 @@ function ComparisonSimulation() {
   };
 
   return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300 flex items-center justify-center">
+
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -242,7 +227,7 @@ function ComparisonSimulation() {
             <div className="space-y-4">
               {results.map((result) => (
                 <motion.div
-                  key={result.persona.name}
+                  key={result.persona.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   className="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
@@ -252,7 +237,7 @@ function ComparisonSimulation() {
                       {result.persona.name}
                     </h4>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {result.persona.age} • {result.persona.occupation} • {result.persona.location} • {result.persona.education} • {result.persona.incomeLevel} • {result.persona.ethnicGroup} • {result.persona.religion} • {result.persona.maritalStatus} 
+                      {result.persona.age} • {result.persona.occupation} • {result.persona.region}
                     </p>
                   </div>
                   <div className="text-right">
@@ -270,7 +255,8 @@ function ComparisonSimulation() {
         </motion.div>
       )}
     </motion.div>
+  </div>
   );
 }
 
-export default ComparisonSimulation;
+export default Poll;

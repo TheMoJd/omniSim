@@ -15,10 +15,11 @@ interface VoteResult {
   persona: Persona;
   choice: string;
   confidence: number;
+  reasonOfChoice?: string;
 }
 
 const personas: Persona[] = [
-  { id: 1, name: "Emma M.", age: "25-34", occupation: "Développeuse", region: "Île-de-France" },
+  { id: 1, name: "Emma M.", age: "25-34", occupation: "Développeuse", region: "Île-de-France", },
   { id: 2, name: "Thomas D.", age: "45-54", occupation: "Enseignant", region: "Nouvelle-Aquitaine" },
   { id: 3, name: "Sophie L.", age: "35-44", occupation: "Commerçante", region: "Auvergne-Rhône-Alpes" },
   { id: 4, name: "Pierre M.", age: "55-64", occupation: "Médecin", region: "Bretagne" },
@@ -76,7 +77,6 @@ function Poll() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-300 flex items-center justify-center">
 
     <motion.div
       initial={{ opacity: 0 }}
@@ -255,7 +255,6 @@ function Poll() {
         </motion.div>
       )}
     </motion.div>
-  </div>
   );
 }
 

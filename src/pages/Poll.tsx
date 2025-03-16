@@ -77,7 +77,7 @@ function Poll() {
   };
 
   return (
-
+    <div className="max-w-6xl mx-auto py-12 pt-24 px-4 sm:px-6 lg:px-8">
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -102,7 +102,7 @@ function Poll() {
               type="text"
               value={optionA}
               onChange={(e) => setOptionA(e.target.value)}
-              placeholder="Ex: Vélo électrique"
+              placeholder="Ex: Kamalla HArris"
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
             />
           </div>
@@ -114,7 +114,7 @@ function Poll() {
               type="text"
               value={optionB}
               onChange={(e) => setOptionB(e.target.value)}
-              placeholder="Ex: Trottinette électrique"
+              placeholder="Ex: Donald Trump"
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
             />
           </div>
@@ -255,6 +255,7 @@ function Poll() {
         </motion.div>
       )}
     </motion.div>
+    </div>
   );
 }
 
